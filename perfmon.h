@@ -45,11 +45,11 @@ struct Counter {
     /** Name of the counter scope */
     const char* name;
 
-    ///** Total seconds have spent */
+    /** Total seconds have spent */
     double Seconds() const;
 };
 
-} // perfmon
+} // namespace perfmon
 
 /** Get list of the available counters */
 #define PERFMON_COUNTERS

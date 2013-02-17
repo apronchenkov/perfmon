@@ -50,7 +50,6 @@ private:
     const_iterator end_;
 };
 
-
 Counters counters();
 
 Counter& counter(const char* counter_name);
