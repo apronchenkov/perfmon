@@ -62,7 +62,7 @@ Counter& counter(const char* counter_name);
 #undef PERFMON_SCOPE
 
 #define PERFMON_COUNTERS               (::perfmon::internal::counters())
-#define PERFMON_COUNTER(counter_name)  ([]()->::perfmon::Counter& { static auto& counter_ref = ::perfmon::internal::counter(counter_name); return counter_ref; }())
+#define PERFMON_COUNTER(counter_name)  ([](const char* name)->::perfmon::Counter& { static auto& counter_ref = ::perfmon::internal::counter(name); return counter_ref; }(counter_name))
 
 #ifdef NDEBUG
 #define PERFMON_SCOPE(counter_name)    do { } while(false)
