@@ -45,13 +45,16 @@ struct Counter {
     std::atomic_uint_fast64_t ticks;
 
     /** Name of the counter scope */
-    const char* name;
+    const char* const name;
 
     /** Total seconds have spent */
     double Seconds() const { return 1.0 / EstimateCpuFrequency() * ticks; }
 
     /** Average seconds have spent per call */
     double AverageSeconds() const { return Seconds() / calls; }
+
+    /* Ctor */
+    Counter() : calls(0), ticks(0), name(NULL) { }
 };
 
 } // namespace perfmon

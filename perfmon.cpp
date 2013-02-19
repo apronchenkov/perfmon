@@ -9,9 +9,16 @@ namespace internal {
 
 namespace {
 
-std::list<::perfmon::Counter> g_counters(1);
-
 std::mutex g_mutex;
+
+std::list<::perfmon::Counter> g_counters;
+
+/* Enforce counter creation at runtime. */
+const auto g_is_init = []() {
+    g_counters.resize(2);
+    const_cast<const char*&>(g_counters.front().name) = "EstimateCpuFrequency";
+    return true;
+}();
 
 } // namespace
 
@@ -32,11 +39,9 @@ Counter& counter(const char* counter_name)
     }
 
     Counter& result = g_counters.back();
-    g_counters.resize(g_counters.size() + 1);
+    g_counters.emplace_back();
 
-    result.calls = 0;
-    result.ticks = 0;
-    result.name = counter_name;
+    const_cast<const char*&>(result.name) = counter_name;
     return result;
 }
 

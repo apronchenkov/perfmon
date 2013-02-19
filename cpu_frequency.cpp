@@ -12,10 +12,6 @@
 
 namespace {
 
-/* Enforce counter creation at runtime. */
-const char SELF_COUNTER_NAME[] = "EstimateCpuFrequency";
-const auto& SELF_COUNTER_REF = PERFMON_COUNTER(SELF_COUNTER_NAME);
-
 /** Simple estimation of the cpu frequency. */
 double EstimateCpuFrequency(double sleep_seconds)
 {
@@ -40,7 +36,7 @@ double EstimateCpuFrequency(double sleep_seconds)
 /** Estimation based on median. */
 double EstimateCpuFrequency(double total_sleep_seconds, size_t sample_size)
 {
-    PERFMON_SCOPE(SELF_COUNTER_NAME);
+    PERFMON_SCOPE("EstimateCpuFrequency");
     const auto sleep_seconds = total_sleep_seconds / sample_size;
 
     std::vector<double> sample;
