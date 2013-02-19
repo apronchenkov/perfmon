@@ -1,4 +1,5 @@
 #include "perfmon.h"
+
 #include <cstdlib>
 #include <list>
 #include <mutex>
@@ -7,9 +8,6 @@ namespace perfmon {
 namespace internal {
 
 namespace {
-
-#undef STUB_COUNTER
-#define STUB_COUNTER  {{0}, {0}, NULL}
 
 std::list<::perfmon::Counter> g_counters(1);
 

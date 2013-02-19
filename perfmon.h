@@ -27,10 +27,12 @@
  *   You could get current statistics in the following way:
  *
  *     for (const auto& counter : PERFMON_COUNTERS) {
- *        std::cout << counter.name << ' ' << counter.calls << ' ' << counter.seconds() << std::endl;
+ *        std::cout << counter.name << ' ' << counter.calls << ' ' << counter.Seconds() << std::endl;
  *     }
  */
 
+#include "cpu_frequency.h"
+#include "ticks.h"
 #include <atomic>
 
 namespace perfmon {
@@ -46,7 +48,10 @@ struct Counter {
     const char* name;
 
     /** Total seconds have spent */
-    double Seconds() const;
+    double Seconds() const { return 1.0 / EstimateCpuFrequency() * ticks; }
+
+    /** Average seconds have spent per call */
+    double AverageSeconds() const { return Seconds() / calls; }
 };
 
 } // namespace perfmon

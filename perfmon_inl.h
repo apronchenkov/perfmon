@@ -2,7 +2,6 @@
 #error "You should no use this file directly. Please include the 'perfmon.h'."
 #endif // PERFMON_INL_H
 
-#include "ticks.h"
 #include <list>
 
 namespace perfmon {
