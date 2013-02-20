@@ -10,29 +10,20 @@
 namespace {
 
 /** Simple estimation of the cpu frequency. */
-template<class ClockReader>
-double EstimateCpuFrequencyImpl(double sleep_seconds)
+double EstimateCpuFrequency(double sleep_seconds)
 {
+    typedef std::conditional<std::chrono::high_resolution_clock::is_steady, std::chrono::high_resolution_clock, std::chrono::steady_clock>::type ClockType;
+
     const auto sleep_duration = std::chrono::duration<double>(sleep_seconds);
 
     const auto startTick = ReadTickCounter();
-    const auto startClock = ClockReader::now();
+    const auto startClock = ClockType::now();
     std::this_thread::sleep_for(sleep_duration);
     const auto stopTick = ReadTickCounter();
-    const auto stopClock = ClockReader::now();
+    const auto stopClock = ClockType::now();
 
     const auto secondsElapsed = std::chrono::duration_cast<std::chrono::duration<double>>(stopClock - startClock).count();
     return TicksElapsed(startTick, stopTick) / secondsElapsed;
-}
-
-/** Simple estimation of the cpu frequency. */
-double EstimateCpuFrequency(double sleep_seconds)
-{
-    if (std::chrono::high_resolution_clock::is_steady) {
-        return EstimateCpuFrequencyImpl<std::chrono::high_resolution_clock>(sleep_seconds);
-    } else {
-        return EstimateCpuFrequencyImpl<std::chrono::steady_clock>(sleep_seconds);
-    }
 }
 
 /** Estimation based on median. */
