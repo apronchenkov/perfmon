@@ -20,8 +20,7 @@ void function()
 or the PERFMON_SCOPE for any scope
 
 ```cpp
-{
-    PERFMON_SCOPE("scope_name");
+PERFMON_SCOPE("scope_name") {
     ... // scope body
 }
 ```

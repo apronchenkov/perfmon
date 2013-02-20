@@ -29,7 +29,7 @@ double EstimateCpuFrequency(double sleep_seconds)
 /** Estimation based on median. */
 double EstimateCpuFrequency(double total_sleep_seconds, size_t sample_size)
 {
-    PERFMON_SCOPE("EstimateCpuFrequency");
+    PERFMON_FUNCTION_SCOPE;
     const auto sleep_seconds = total_sleep_seconds / sample_size;
 
     std::vector<double> sample(sample_size);

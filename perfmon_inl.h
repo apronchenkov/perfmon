@@ -20,6 +20,11 @@ public:
         ++counter_ref_.calls;
     }
 
+    explicit operator bool () const
+    {
+        return false;
+    }
+
 private:
     ::perfmon::Counter& counter_ref_;
     const Tick start_tick_;
@@ -59,15 +64,21 @@ Counter& counter(const char* counter_name);
 #undef PERFMON_COUNTERS
 #undef PERFMON_COUNTER
 #undef PERFMON_SCOPE
+#undef PERFMON_FUNCTION_SCOPE
 
 #define PERFMON_COUNTERS               (::perfmon::internal::counters())
 #define PERFMON_COUNTER(counter_name)  ([](const char* name)->::perfmon::Counter& { static auto& counter_ref = ::perfmon::internal::counter(name); return counter_ref; }(counter_name))
 
 #ifdef NDEBUG
-#define PERFMON_SCOPE(counter_name)    do { } while(false)
+#define PERFMON_SCOPE(counter_name)       if (false) { throw; } else
+#define PERFMON_FUNCTION_SCOPE            do { } while (false)
+
 #else // NDEBUG
-#define PERFMON_INTERNAL__CONCAT(x, y) x ## y
-#define PERFMON_INTERNAL_CONCAT(x, y)  PERFMON_INTERNAL__CONCAT(x, y)
-#define PERFMON_INTERNAL_SCOPE_VAR     PERFMON_INTERNAL_CONCAT(perfmon_scope_monitor_, __COUNTER__)
-#define PERFMON_SCOPE(counter_name)    const ::perfmon::internal::Monitor PERFMON_INTERNAL_SCOPE_VAR (PERFMON_COUNTER(counter_name))
+#define PERFMON_INTERNAL__CONCAT(x, y)    x ## y
+#define PERFMON_INTERNAL_CONCAT(x, y)     PERFMON_INTERNAL__CONCAT(x, y)
+#define PERFMON_INTERNAL_SCOPE_VAR        PERFMON_INTERNAL_CONCAT(perfmon_scope_monitor_, __COUNTER__)
+
+#define PERFMON_SCOPE(counter_name)       if (const auto PERFMON_INTERNAL_SCOPE_VAR = ::perfmon::internal::Monitor(PERFMON_COUNTER(counter_name))) { /* Suppress the 'control may reach end of non-void function' warning */ throw; } else
+#define PERFMON_FUNCTION_SCOPE            ::perfmon::internal::Monitor PERFMON_INTERNAL_SCOPE_VAR (PERFMON_COUNTER(__FUNCTION__))
+
 #endif // NDEBUG

@@ -15,8 +15,7 @@
  *
  *   or the PERFMON_SCOPE for any scope
  *
- *     {
- *         PERFMON_SCOPE("scope_name");
+ *     PERFMON_SCOPE("scope_name") {
  *         ... // scope body
  *     }
  *
@@ -65,11 +64,11 @@ struct Counter {
 /** Get a counter with specific name */
 #define PERFMON_COUNTER(counter_name)
 
-/** Create a monitor for current scope */
+/** Create a monitor for the following scope */
 #define PERFMON_SCOPE(counter_name)
 
 /** Create a monitor with current function name */
-#define PERFMON_FUNCTION_SCOPE    PERFMON_SCOPE(__FUNCTION__)
+#define PERFMON_FUNCTION_SCOPE
 
 #define PERFMON_INL_H
 #include "perfmon_inl.h"
