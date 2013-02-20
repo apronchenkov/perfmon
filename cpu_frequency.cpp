@@ -3,34 +3,36 @@
 #include "ticks.h"
 
 #include <algorithm>
-#include <cmath>
-#include <limits>
+#include <chrono>
+#include <thread>
 #include <vector>
-
-#include <sys/time.h>
-#include <unistd.h>
 
 namespace {
 
 /** Simple estimation of the cpu frequency. */
-double EstimateCpuFrequency(double sleep_seconds)
+template<class ClockReader>
+double EstimateCpuFrequencyImpl(double sleep_seconds)
 {
-    struct timeval tvstart, tvstop;
+    const auto sleep_duration = std::chrono::duration<double>(sleep_seconds);
 
     const auto startTick = ReadTickCounter();
-    if (0 != gettimeofday(&tvstart, NULL)) {
-        return std::numeric_limits<double>::quiet_NaN();
-    }
-    if (0 != usleep(static_cast<useconds_t>(sleep_seconds * 1e6))) {
-        return std::numeric_limits<double>::quiet_NaN();
-    }
+    const auto startClock = ClockReader::now();
+    std::this_thread::sleep_for(sleep_duration);
     const auto stopTick = ReadTickCounter();
-    if (0 != gettimeofday(&tvstop, NULL)) {
-        return std::numeric_limits<double>::quiet_NaN();
-    }
+    const auto stopClock = ClockReader::now();
 
-    const double secondsElapsed = (tvstop.tv_sec - tvstart.tv_sec) + (tvstop.tv_usec - tvstart.tv_usec) * 1e-6;
+    const auto secondsElapsed = std::chrono::duration_cast<std::chrono::duration<double>>(stopClock - startClock).count();
     return TicksElapsed(startTick, stopTick) / secondsElapsed;
+}
+
+/** Simple estimation of the cpu frequency. */
+double EstimateCpuFrequency(double sleep_seconds)
+{
+    if (std::chrono::high_resolution_clock::is_steady) {
+        return EstimateCpuFrequencyImpl<std::chrono::high_resolution_clock>(sleep_seconds);
+    } else {
+        return EstimateCpuFrequencyImpl<std::chrono::steady_clock>(sleep_seconds);
+    }
 }
 
 /** Estimation based on median. */
@@ -39,18 +41,9 @@ double EstimateCpuFrequency(double total_sleep_seconds, size_t sample_size)
     PERFMON_SCOPE("EstimateCpuFrequency");
     const auto sleep_seconds = total_sleep_seconds / sample_size;
 
-    std::vector<double> sample;
-    sample.reserve(sample_size);
-
-    for (size_t index = 0; index < sample_size; ++index) {
-        const auto value = EstimateCpuFrequency(sleep_seconds);
-        if (!std::isnan(value)) {
-            sample.push_back(value);
-        }
-    }
-
-    if (sample.empty() || sample.size() + 3 < sample_size) {
-        return std::numeric_limits<double>::quiet_NaN();
+    std::vector<double> sample(sample_size);
+    for (auto& value : sample) {
+        value = EstimateCpuFrequency(sleep_seconds);
     }
 
     std::sort(sample.begin(), sample.end());
