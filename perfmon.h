@@ -13,11 +13,18 @@
  *         ... // function body
  *     }
  *
- *   or the PERFMON_SCOPE for any scope
+ *   or the PERFMON_SCOPE for any scopes inside a function:
  *
- *     PERFMON_SCOPE("scope_name") {
+ *     PERFMON_SCOPE("counter_name") {
  *         ... // scope body
  *     }
+ *
+ *   There is also a PERFMON_EXPRESSION macro for expressions:
+ *
+ *     variable = PERFMON_EXPRESSION("counter_name", expression);
+ *
+ *   but at this point I didn't test it in a real environment.
+ *
  *
  *   WARNING! Most probably you would not like to use the PERFMON macros in
  *   recursive scopes. You could, if you understand what you want; but values of
@@ -69,6 +76,9 @@ struct Counter {
 
 /** Create a monitor with current function name */
 #define PERFMON_FUNCTION_SCOPE
+
+/** Experimental: Create a monitor for an expression */
+#define PERFMON_EXPRESSION(counter_name, EXPR)
 
 #define PERFMON_INL_H
 #include "perfmon_inl.h"

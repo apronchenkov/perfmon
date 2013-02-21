@@ -65,6 +65,7 @@ Counter& counter(const char* counter_name);
 #undef PERFMON_COUNTER
 #undef PERFMON_SCOPE
 #undef PERFMON_FUNCTION_SCOPE
+#undef PERFMON_EXPRESSION
 
 #define PERFMON_COUNTERS               (::perfmon::internal::counters())
 #define PERFMON_COUNTER(counter_name)  ([](const char* name)->::perfmon::Counter& { static auto& counter_ref = ::perfmon::internal::counter(name); return counter_ref; }(counter_name))
@@ -72,6 +73,7 @@ Counter& counter(const char* counter_name);
 #ifdef NDEBUG
 #define PERFMON_SCOPE(counter_name)       if (false) { throw; } else
 #define PERFMON_FUNCTION_SCOPE            do { } while (false)
+#define PERFMON_EXPRESSION(counter_name, EXPR)  (EXPR)
 
 #else // NDEBUG
 #define PERFMON_INTERNAL__CONCAT(x, y)    x ## y
@@ -80,5 +82,6 @@ Counter& counter(const char* counter_name);
 
 #define PERFMON_SCOPE(counter_name)       if (const auto PERFMON_INTERNAL_SCOPE_VAR = ::perfmon::internal::Monitor(PERFMON_COUNTER(counter_name))) { /* Suppress the 'control may reach end of non-void function' warning */ throw; } else
 #define PERFMON_FUNCTION_SCOPE            ::perfmon::internal::Monitor PERFMON_INTERNAL_SCOPE_VAR (PERFMON_COUNTER(__FUNCTION__))
+#define PERFMON_EXPRESSION(counter_name, EXPR)  ([&]() -> decltype((EXPR)) { PERFMON_SCOPE(counter_name) { return (EXPR); } }())
 
 #endif // NDEBUG

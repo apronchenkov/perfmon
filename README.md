@@ -17,13 +17,22 @@ void function()
 }
 ```
 
-or the PERFMON_SCOPE for any scope
+or the PERFMON_SCOPE for any scopes inside a function:
 
 ```cpp
 PERFMON_SCOPE("scope_name") {
     ... // scope body
 }
 ```
+
+There is also a PERFMON_EXPRESSION macro for expressions:
+
+```cpp
+variable = PERFMON_EXPRESSION("counter_name", expression);
+```
+
+but at this point I didn't test it in a real environment.
+
 
 WARNING! Most probably you would not like to use the PERFMON macros in
 recursive scopes. You could, if you understand what you want; but values of
