@@ -11,14 +11,7 @@ namespace {
 
 std::mutex g_mutex;
 
-std::list<::perfmon::Counter> g_counters;
-
-/* Enforce counter creation at runtime. */
-const auto g_is_init = []() {
-    g_counters.resize(2);
-    const_cast<const char*&>(g_counters.front().name) = "EstimateCpuFrequency";
-    return true;
-}();
+std::list<::perfmon::Counter> g_counters(1);
 
 } // namespace
 

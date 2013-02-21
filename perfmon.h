@@ -61,7 +61,7 @@ struct Counter {
 /** Get list of the available counters */
 #define PERFMON_COUNTERS
 
-/** Get a counter with specific name */
+/** Get a counter with a specific name */
 #define PERFMON_COUNTER(counter_name)
 
 /** Create a monitor for the following scope */
