@@ -46,12 +46,15 @@ namespace perfmon {
 struct Counter {
     /** Total number of calls */
     std::atomic_uint_fast64_t calls;
+    uint64_t Calls() const { return calls; }
 
     /** Total ticks have spent */
     std::atomic_uint_fast64_t ticks;
+    uint64_t Ticks() const { return ticks; }
 
     /** Name of the counter scope */
     const char* const name;
+    const char* Name() const { return name; }
 
     /** Total seconds have spent */
     double Seconds() const { return 1.0 / EstimateCpuFrequency() * ticks; }
