@@ -62,6 +62,13 @@ struct Counter {
     /** Average seconds have spent per call */
     double AverageSeconds() const { return Seconds() / calls; }
 
+    /** Test the counter for any value. */
+    explicit operator bool () const { return calls || ticks; }
+
+    /** Reset the counter */
+    void Reset() { while (*this) { calls = 0; ticks = 0; } }
+    void Reset() const { const_cast<Counter*>(this)->Reset(); }
+
     /* Ctor */
     Counter() : calls(0), ticks(0), name(NULL) { }
 };
