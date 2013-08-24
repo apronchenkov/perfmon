@@ -64,7 +64,7 @@ struct Counter {
     double AverageSeconds() const { return Seconds() / calls; }
 
     /** Test the counter for any value. */
-    explicit operator bool () const { return calls || ticks; }
+    explicit operator bool () const { return calls; }
 
     /** Reset the counter */
     void Reset() { while (*this) { calls = 0; ticks = 0; } }

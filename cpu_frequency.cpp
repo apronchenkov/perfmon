@@ -7,6 +7,8 @@
 #include <thread>
 #include <vector>
 
+namespace perfmon {
+
 namespace {
 
 /** Simple estimation of the cpu frequency. */
@@ -47,3 +49,5 @@ double EstimateCpuFrequency()
     static const auto result = EstimateCpuFrequency(std::chrono::milliseconds(5), 11);
     return result;
 }
+
+} // namespace perfmon

@@ -46,7 +46,7 @@ private:
 #define PERFMON_COUNTERS                  (::perfmon::internal::Counters())
 
 /** Get cached ref of the counter */
-#define PERFMON_COUNTER(counter_name)     ([](const char* name)->::perfmon::Counter& { static auto& counter_ref = ::perfmon::internal::counter(name); return counter_ref; }(counter_name))
+#define PERFMON_COUNTER(counter_name)     ([](const char* name)->::perfmon::Counter& { static auto& counter_ref = ::perfmon::internal::CounterRef(name); return counter_ref; }(counter_name))
 
 /** Function scope */
 #define PERFMON_FUNCTION_SCOPE            PERFMON_SCOPE(__FUNCTION__)

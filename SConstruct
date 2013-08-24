@@ -1,12 +1,11 @@
 env = Environment()
 if env['PLATFORM'] == 'darwin':
    env['CXX']='clang++'
-   env.Append(CXXFLAGS=['-O2', '-g', '-std=c++11', '-Wall', '-Wextra', '-pedantic', '-stdlib=libc++'])
-   env.Append(LINKFLAGS=['-stdlib=libc++', '-L/usr/local/lib/x86_64', '-ljit', "-lperfmon"])
+   env.Append(CXXFLAGS=['-O2', '-g', '-std=c++11', '-Wall', '-Wextra', '-pedantic', '-pthread', '-stdlib=libc++'])
+   env.Append(LINKFLAGS=['-stdlib=libc++'])
 else:
    env['CXX']='g++'
    env.Append(CXXFLAGS=['-O2', '-g', '-std=c++0x', '-Wall', '-Wextra', '-pedantic', '-pthread'])
-   env.Append(LINKFLAGS=['-pthread'])
 
 libperfmon = env.SharedLibrary(
     target='perfmon',
@@ -15,3 +14,5 @@ libperfmon = env.SharedLibrary(
         'perfmon.cpp'
     ]
 )
+
+test_gcd = env.Program(['test.cpp', 'test_scope.cpp'], LIBS=[libperfmon, 'boost_unit_test_framework'])
