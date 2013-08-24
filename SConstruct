@@ -15,4 +15,4 @@ libperfmon = env.SharedLibrary(
     ]
 )
 
-test_gcd = env.Program(['test.cpp', 'test_scope.cpp'], LIBS=[libperfmon, 'boost_unit_test_framework'])
+test = env.Program(['test.cpp', 'test_scope.cpp', 'test_statement.cpp'], LIBS=[libperfmon, 'boost_unit_test_framework'])
