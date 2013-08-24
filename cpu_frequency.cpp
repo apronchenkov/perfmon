@@ -10,11 +10,12 @@
 namespace {
 
 /** Simple estimation of the cpu frequency. */
-double EstimateCpuFrequency(double sleep_seconds)
+template <class Rep, class Period>
+double EstimateCpuFrequency(const std::chrono::duration<Rep, Period>& sleep_duration)
 {
-    typedef std::conditional<std::chrono::high_resolution_clock::is_steady, std::chrono::high_resolution_clock, std::chrono::steady_clock>::type ClockType;
-
-    const auto sleep_duration = std::chrono::duration<double>(sleep_seconds);
+    typedef std::conditional<std::chrono::high_resolution_clock::is_monotonic,
+                             std::chrono::high_resolution_clock,
+                             std::chrono::monotonic_clock>::type ClockType;
 
     const auto startTick = ReadTickCounter();
     const auto startClock = ClockType::now();
@@ -27,21 +28,15 @@ double EstimateCpuFrequency(double sleep_seconds)
 }
 
 /** Estimation based on median. */
-double EstimateCpuFrequency(double total_sleep_seconds, size_t sample_size)
+template <class Rep, class Period>
+double EstimateCpuFrequency(const std::chrono::duration<Rep, Period>& sleep_duration, size_t sample_size)
 {
-    const auto sleep_seconds = total_sleep_seconds / sample_size;
-
     std::vector<double> sample(sample_size);
     for (auto& value : sample) {
-        value = EstimateCpuFrequency(sleep_seconds);
+        value = EstimateCpuFrequency(sleep_duration);
     }
-
     std::sort(sample.begin(), sample.end());
-    if (sample.size() % 2 == 0) {
-        return (sample[sample.size()/2 - 1] + sample[sample.size()/2]) / 2.0;
-    } else {
-        return sample[sample.size()/2];
-    }
+    return sample.at(sample.size() / 2);
 }
 
 } // namespace
@@ -49,6 +44,6 @@ double EstimateCpuFrequency(double total_sleep_seconds, size_t sample_size)
 
 double EstimateCpuFrequency()
 {
-    static const auto result = EstimateCpuFrequency(0.5, 7);
+    static const auto result = EstimateCpuFrequency(std::chrono::milliseconds(5), 11);
     return result;
 }

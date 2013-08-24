@@ -15,16 +15,16 @@
  *
  *   or the PERFMON_SCOPE for any scopes inside a function:
  *
- *     PERFMON_SCOPE("counter_name") {
+ *     {
+ *         PERFMON_SCOPE("counter_name");
  *         ... // scope body
  *     }
  *
- *   There is also a PERFMON_EXPRESSION macro for expressions:
+ *   or the PERFMON_STATEMENT for a statement:
  *
- *     variable = PERFMON_EXPRESSION("counter_name", expression);
- *
- *   but at this point I didn't test it in a real environment.
- *
+ *     PERFMON_STATEMENT("counter_name") {
+ *         ... // statement
+ *     }
  *
  *   WARNING! Most probably you would not like to use the PERFMON macros in
  *   recursive scopes. You could, if you understand what you want; but values of
@@ -33,13 +33,14 @@
  *   You could get current statistics in the following way:
  *
  *     for (const auto& counter : PERFMON_COUNTERS) {
- *        std::cout << counter.name << ' ' << counter.calls << ' ' << counter.Seconds() << std::endl;
+ *        std::cout << counter.Name() << ' ' << counter.Calls() << ' ' << counter.Seconds() << std::endl;
  *     }
  */
 
 #include "cpu_frequency.h"
 #include "ticks.h"
 #include <atomic>
+#include <list>
 
 namespace perfmon {
 
@@ -57,7 +58,7 @@ struct Counter {
     const char* Name() const { return name; }
 
     /** Total seconds have spent */
-    double Seconds() const { return 1.0 / EstimateCpuFrequency() * ticks; }
+    double Seconds() const { return static_cast<double>(ticks) / EstimateCpuFrequency(); }
 
     /** Average seconds have spent per call */
     double AverageSeconds() const { return Seconds() / calls; }
@@ -70,7 +71,25 @@ struct Counter {
     void Reset() const { const_cast<Counter*>(this)->Reset(); }
 
     /* Ctor */
-    Counter() : calls(0), ticks(0), name(NULL) { }
+    Counter() : calls(0), ticks(0), name(nullptr) { }
+};
+
+class Counters {
+public:
+    typedef std::list<Counter>::const_iterator const_iterator;
+
+    Counters(const_iterator begin, const_iterator end)
+      : begin_(begin)
+      , end_(end)
+    { }
+
+    /** Iterator range interface */
+    const_iterator begin() const { return begin_; }
+    const_iterator end() const { return end_; }
+
+private:
+    const_iterator begin_;
+    const_iterator end_;
 };
 
 } // namespace perfmon
@@ -87,8 +106,8 @@ struct Counter {
 /** Create a monitor with current function name */
 #define PERFMON_FUNCTION_SCOPE
 
-/** Experimental: Create a monitor for an expression */
-#define PERFMON_EXPRESSION(counter_name, EXPR)
+/** Create a monitor for the following statement */
+#define PERFMON_STATEMENT(counter_name)
 
 #define PERFMON_INL_H
 #include "perfmon_inl.h"

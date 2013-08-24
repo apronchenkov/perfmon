@@ -1,6 +1,8 @@
 #include "perfmon.h"
 
 #include <cstdlib>
+#include <cstring>
+#include <iterator>
 #include <list>
 #include <mutex>
 
@@ -11,17 +13,17 @@ namespace {
 
 std::mutex g_mutex;
 
-std::list<::perfmon::Counter> g_counters(1);
+std::list< ::perfmon::Counter > g_counters(1);
 
 } // namespace
 
-Counters counters()
+::perfmon::Counters Counters()
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    return Counters(g_counters.begin(), --g_counters.end());
+    return ::perfmon::Counters(g_counters.begin(), std::prev(g_counters.end()));
 }
 
-Counter& counter(const char* counter_name)
+::perfmon::Counter& CounterRef(const char* counter_name)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
 

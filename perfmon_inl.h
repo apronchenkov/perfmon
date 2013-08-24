@@ -30,58 +30,40 @@ private:
     const Tick start_tick_;
 };
 
-class Counters {
-public:
-    typedef std::list<Counter>::const_iterator const_iterator;
+::perfmon::Counters Counters();
 
-    Counters(const_iterator begin, const_iterator end)
-      : begin_(begin)
-      , end_(end)
-    { }
-
-    const_iterator begin() const
-    {
-        return begin_;
-    }
-
-    const_iterator end() const
-    {
-        return end_;
-    }
-
-private:
-    const_iterator begin_;
-    const_iterator end_;
-};
-
-Counters counters();
-
-Counter& counter(const char* counter_name);
+::perfmon::Counter& CounterRef(const char* counter_name);
 
 } } // namespace perfmon::internal
-
 
 #undef PERFMON_COUNTERS
 #undef PERFMON_COUNTER
 #undef PERFMON_SCOPE
+#undef PERFMON_STATEMENT
 #undef PERFMON_FUNCTION_SCOPE
-#undef PERFMON_EXPRESSION
 
-#define PERFMON_COUNTERS               (::perfmon::internal::counters())
-#define PERFMON_COUNTER(counter_name)  ([](const char* name)->::perfmon::Counter& { static auto& counter_ref = ::perfmon::internal::counter(name); return counter_ref; }(counter_name))
+/** Get list of counters */
+#define PERFMON_COUNTERS                  (::perfmon::internal::Counters())
+
+/** Get cached ref of the counter */
+#define PERFMON_COUNTER(counter_name)     ([](const char* name)->::perfmon::Counter& { static auto& counter_ref = ::perfmon::internal::counter(name); return counter_ref; }(counter_name))
+
+/** Function scope */
+#define PERFMON_FUNCTION_SCOPE            PERFMON_SCOPE(__FUNCTION__)
+
 
 #ifdef NDEBUG
-#define PERFMON_SCOPE(counter_name)       if (false) { throw; } else
-#define PERFMON_FUNCTION_SCOPE            do { } while (false)
-#define PERFMON_EXPRESSION(counter_name, EXPR)  (EXPR)
-
+#define PERFMON_SCOPE(counter_name)       do { } while (false)
+#define PERFMON_STATEMENT(counter_name)   if (false) { throw; } else
 #else // NDEBUG
+/** Scope */
+#define PERFMON_SCOPE(counter_name)       const auto PERFMON_INTERNAL_SCOPE_VAR = ::perfmon::internal::Monitor(PERFMON_COUNTER(counter_name))
+/** Statement */
+#define PERFMON_STATEMENT(counter_name)   if (PERFMON_SCOPE(counter_name)) { /* Suppress the 'control may reach end of non-void function' warning */ } else
+#endif // NDEBUG
+
 #define PERFMON_INTERNAL__CONCAT(x, y)    x ## y
 #define PERFMON_INTERNAL_CONCAT(x, y)     PERFMON_INTERNAL__CONCAT(x, y)
 #define PERFMON_INTERNAL_SCOPE_VAR        PERFMON_INTERNAL_CONCAT(perfmon_scope_monitor_, __COUNTER__)
 
-#define PERFMON_SCOPE(counter_name)       if (const auto PERFMON_INTERNAL_SCOPE_VAR = ::perfmon::internal::Monitor(PERFMON_COUNTER(counter_name))) { /* Suppress the 'control may reach end of non-void function' warning */ throw; } else
-#define PERFMON_FUNCTION_SCOPE            ::perfmon::internal::Monitor PERFMON_INTERNAL_SCOPE_VAR (PERFMON_COUNTER(__FUNCTION__))
-#define PERFMON_EXPRESSION(counter_name, EXPR)  ([&]() -> decltype((EXPR)) { PERFMON_SCOPE(counter_name) { return (EXPR); } }())
 
-#endif // NDEBUG
