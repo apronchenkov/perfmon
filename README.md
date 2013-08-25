@@ -20,19 +20,19 @@ void function()
 or the PERFMON_SCOPE for any scopes inside a function:
 
 ```cpp
-PERFMON_SCOPE("scope_name") {
+{
+    PERFMON_SCOPE("scope_name");
     ... // scope body
 }
 ```
 
-There is also a PERFMON_EXPRESSION macro for expressions:
+or the PERFMON_STATEMENT for a statement:
 
 ```cpp
-variable = PERFMON_EXPRESSION("counter_name", expression);
+PERFMON_STATEMENT("counter_name") {
+    ... // statement
+}
 ```
-
-but at this point I didn't test it in a real environment.
-
 
 WARNING! Most probably you would not like to use the PERFMON macros in
 recursive scopes. You could, if you understand what you want; but values of
@@ -42,6 +42,6 @@ You could get current statistics in the following way:
 
 ```cpp
 for (const auto& counter : PERFMON_COUNTERS) {
-    std::cout << counter.name << ' ' << counter.calls << ' ' << counter.Seconds() << std::endl;
+    std::cout << counter.name << ' ' << counter.Calls() << ' ' << counter.Seconds() << std::endl;
 }
 ```
