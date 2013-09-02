@@ -16,3 +16,5 @@ libperfmon = env.SharedLibrary(
 )
 
 test = env.Program(['test.cpp', 'test_scope.cpp', 'test_statement.cpp'], LIBS=[libperfmon, 'boost_unit_test_framework'])
+
+env.Program(['test_nbody.cpp'])
