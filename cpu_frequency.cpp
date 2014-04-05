@@ -15,14 +15,13 @@ namespace {
 template <class ClockType, class Rep, class Period>
 double GetCpuFrequencySampleImpl(const std::chrono::duration<Rep, Period>& sleep_duration)
 {
-    const auto startTick = ReadTickCounter();
-    const auto startClock = ClockType::now();
+    const auto start_tick = ReadTickCounter();
+    const auto start_clock = ClockType::now();
     std::this_thread::sleep_for(sleep_duration);
-    const auto stopTick = ReadTickCounter();
-    const auto stopClock = ClockType::now();
+    const auto ticks_elapsed = TicksElapsedSince(start_tick);
 
-    const auto secondsElapsed = std::chrono::duration_cast<std::chrono::duration<double>>(stopClock - startClock).count();
-    return TicksElapsed(startTick, stopTick) / secondsElapsed;
+    const auto seconds_elapsed = std::chrono::duration_cast<std::chrono::duration<double> >(ClockType::now() - start_clock).count();
+    return ticks_elapsed / seconds_elapsed;
 }
 
 template <class Rep, class Period>

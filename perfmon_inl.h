@@ -16,7 +16,7 @@ public:
 
     ~Monitor()
     {
-        counter_ref_.ticks += TicksElapsed(start_tick_, ReadTickCounter());
+        counter_ref_.ticks += TicksElapsedSince(start_tick_);
         ++counter_ref_.calls;
     }
 

@@ -5,9 +5,9 @@
  *
  *   Tick ReadTickCounter(void);
  *
- * Evaluate how many ticks elapsed between two moments:
+ * Evaluate how many ticks elapsed since a moment:
  *
- *   uint64_t TicksElapsed(Tick startTick, Tick stopTick);
+ *   uint64_t TicksElapsed(Tick startTick);
  *
  * Frequency of Ticks depends on hardware and software environment.
  * But you may be sure that the frequency is permanent at runtime.
@@ -29,9 +29,9 @@ inline Tick ReadTickCounter(void)
     return result;
 }
 
-inline uint64_t TicksElapsed(Tick startTick, Tick stopTick)
+inline uint64_t TicksElapsedSince(Tick startTick)
 {
-    return stopTick - startTick;
+    return ReadTickCounter() - startTick;
 }
 #define ticks_h__ok__
 #endif // defined(__i386__)
@@ -46,9 +46,9 @@ inline Tick ReadTickCounter(void)
     return (static_cast<uint64_t>(high) << 32) | low;
 }
 
-inline uint64_t TicksElapsed(Tick startTick, Tick stopTick)
+inline uint64_t TicksElapsedSince(Tick startTick)
 {
-    return stopTick - startTick;
+    return ReadTickCounter() - startTick;
 }
 #define ticks_h__ok__
 #endif // defined(__x86_64__)
