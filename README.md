@@ -7,17 +7,7 @@ A simple performance monitor for C++11.
 Usage
 -----
 
-You could use the PERFMON_FUNCTION_SCOPE macro for functions:
-
-```cpp
-void function()
-{
-    PERFMON_FUNCTION_SCOPE;
-    ... // function body
-}
-```
-
-or the PERFMON_SCOPE for any scopes inside a function:
+You could use the PERFMON_SCOPE for any scopes inside a function:
 
 ```cpp
 {
