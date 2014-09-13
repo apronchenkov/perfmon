@@ -16,10 +16,14 @@
 
 #include <cstdint>
 
+namespace perfmon {
+namespace internal {
+
 #undef ticks_h__ok__
 
 #if defined(__GNUC__) || defined(__ICC) || defined(__clang__)
 #if defined(__i386__)
+
 typedef uint64_t Tick;
 
 inline Tick ReadTickCounter(void)
@@ -33,10 +37,12 @@ inline uint64_t TicksElapsed(Tick startTick, Tick stopTick)
 {
     return stopTick - startTick;
 }
+
 #define ticks_h__ok__
 #endif // defined(__i386__)
 
 #if defined(__x86_64__)
+
 typedef uint64_t Tick;
 
 inline Tick ReadTickCounter(void)
@@ -50,6 +56,7 @@ inline uint64_t TicksElapsed(Tick startTick, Tick stopTick)
 {
     return stopTick - startTick;
 }
+
 #define ticks_h__ok__
 #endif // defined(__x86_64__)
 #endif // defined(__GNUC__) || defined(__ICC) || defined(__clang__)
@@ -57,3 +64,5 @@ inline uint64_t TicksElapsed(Tick startTick, Tick stopTick)
 #ifndef ticks_h__ok__
 #error Your platform is not supported.
 #endif // ticks_h__ok__
+
+} } // namespace perfmon::internal

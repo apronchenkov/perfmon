@@ -1,9 +1,4 @@
 #include "perfmon.h"
-
-#include <cstdlib>
-#include <cstring>
-#include <iterator>
-#include <list>
 #include <mutex>
 
 namespace perfmon {
@@ -11,33 +6,41 @@ namespace internal {
 
 namespace {
 
-std::mutex g_mutex;
+std::mutex& GlobalMutex()
+{
+    static auto& result = *(new std::mutex);
+    return result;
+}
 
-std::list< ::perfmon::Counter > g_counters(1);
+std::forward_list<Counter>& GlobalCounters()
+{
+    static auto& result = *(new std::forward_list<Counter>());
+    return result;
+}
 
 } // namespace
 
-::perfmon::Counters Counters()
+IteratorRange<std::forward_list<Counter>::const_iterator> Counters()
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
-    return ::perfmon::Counters(g_counters.begin(), std::prev(g_counters.end()));
+    auto& global_mutex = GlobalMutex();
+    auto& global_counters = GlobalCounters();
+    std::lock_guard<decltype(global_mutex)> lock(global_mutex);
+    return { global_counters.begin(), global_counters.end() };
 }
 
-::perfmon::Counter& CounterRef(const char* counter_name)
+Counter& CounterRef(std::string&& counter_name)
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
-
-    for (auto& counter : g_counters) {
-        if (counter.name && 0 == ::strcmp(counter.name, counter_name)) {
+    auto& global_mutex = GlobalMutex();
+    auto& global_counters = GlobalCounters();
+    std::lock_guard<decltype(global_mutex)> lock(global_mutex);
+    for (auto& counter : global_counters) {
+        if (counter.Name() == counter_name) {
             return counter;
         }
     }
 
-    Counter& result = g_counters.back();
-    g_counters.emplace_back();
-
-    const_cast<const char*&>(result.name) = counter_name;
-    return result;
+    global_counters.emplace_front(std::move(counter_name));
+    return global_counters.front();
 }
 
 } } // namespace perfmon::internal

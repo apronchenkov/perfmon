@@ -1,6 +1,6 @@
-#include "cpu_frequency.h"
+#include "perfmon/cpu_frequency.h"
+#include "perfmon/ticks.h"
 #include "perfmon.h"
-#include "ticks.h"
 
 #include <algorithm>
 #include <chrono>
@@ -8,12 +8,13 @@
 #include <vector>
 
 namespace perfmon {
+namespace internal {
 
 namespace {
 
 /** Simple estimation of the cpu frequency. */
-template <class ClockType, class Rep, class Period>
-double GetCpuFrequencySampleImpl(const std::chrono::duration<Rep, Period>& sleep_duration)
+template<class ClockType, class Rep, class Period>
+double GetCpuFrequencySampleImpl(const std::chrono::duration<Rep, Period> &sleep_duration)
 {
     const auto startTick = ReadTickCounter();
     const auto startClock = ClockType::now();
@@ -25,18 +26,18 @@ double GetCpuFrequencySampleImpl(const std::chrono::duration<Rep, Period>& sleep
     return TicksElapsed(startTick, stopTick) / secondsElapsed;
 }
 
-template <class Rep, class Period>
-double GetCpuFrequencySample(const std::chrono::duration<Rep, Period>& sleep_duration)
+template<class Rep, class Period>
+double GetCpuFrequencySample(const std::chrono::duration<Rep, Period> &sleep_duration)
 {
     return GetCpuFrequencySampleImpl<std::chrono::high_resolution_clock>(sleep_duration);
 }
 
 /** Estimation based on median. */
-template <class Rep, class Period>
-double EstimateCpuFrequency(const std::chrono::duration<Rep, Period>& sleep_duration, size_t sample_size)
+template<class Rep, class Period>
+double EstimateCpuFrequency(const std::chrono::duration<Rep, Period> &sleep_duration, size_t sample_size)
 {
     std::vector<double> sample(sample_size);
-    for (auto& value : sample) {
+    for (auto &value : sample) {
         value = GetCpuFrequencySample(sleep_duration);
     }
     std::sort(sample.begin(), sample.end());
@@ -52,4 +53,4 @@ double EstimateCpuFrequency()
     return result;
 }
 
-} // namespace perfmon
+} } // namespace perfmon::internal
