@@ -31,7 +31,7 @@ tick counter would be a bit crazy for a human being.
 You could get current statistics in the following way:
 
 ```cpp
-for (const auto& counter : PERFMON_COUNTERS) {
-    std::cout << counter.name << ' ' << counter.Calls() << ' ' << counter.Seconds() << std::endl;
+for (const auto& counter : PERFMON_COUNTERS()) {
+    std::cout << counter.Name() << ' ' << counter.Calls() << ' ' << counter.Seconds() << std::endl;
 }
 ```
