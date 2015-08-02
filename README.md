@@ -7,7 +7,7 @@ A simple performance monitor for C++11.
 Usage
 -----
 
-You could use the PERFMON_SCOPE for any scopes inside a function:
+You could use the PERFMON_SCOPE for a scope inside of a function:
 
 ```cpp
 {
@@ -35,3 +35,7 @@ for (const auto& counter : PERFMON_COUNTERS()) {
     std::cout << counter.Name() << ' ' << counter.Calls() << ' ' << counter.Seconds() << std::endl;
 }
 ```
+
+Values of PERFMON_COUNTERS() can be influenced by non-atomicity
+of the integer arithmetic. I believe that this problem should be very rare.
+You can also call PERFMON_COUNTER() three times in row and use the median.

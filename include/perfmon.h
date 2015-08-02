@@ -1,11 +1,9 @@
-#pragma once
-
 /**
  * Performance monitor library
  *
  * Usage:
  *
- *   You could use the PERFMON_SCOPE for any scopes inside a function:
+ *   You could use the PERFMON_SCOPE for a scope inside of a function:
  *
  *     {
  *         PERFMON_SCOPE("counter_name");
@@ -27,56 +25,55 @@
  *     for (const auto& counter : PERFMON_COUNTERS()) {
  *        std::cout << counter.Name() << ' ' << counter.Calls() << ' ' << counter.Seconds() << std::endl;
  *     }
+ *
+ *   Values of PERFMON_COUNTERS() can be influenced by non-atomicity
+ *   of the integer arithmetic. I believe that this problem should be very rare.
+ *   You can also call PERFMON_COUNTER() three times in row and use the median.
+ *
  */
+#pragma once
 
-#include <atomic>
+#include <cstdint>
 #include <string>
+#include <vector>
 
 namespace perfmon {
 
 class Counter {
 public:
+    /** Constructor */
+    Counter(const std::string* name_ptr, uint_fast64_t calls, uint_fast64_t ticks);
+
     /** Name of the counter scope */
     const std::string& Name() const;
 
     /** Total number of calls */
-    uint64_t Calls() const;
+    uint_fast64_t Calls() const;
 
     /** Total ticks have spent */
-    uint64_t Ticks() const;
+    uint_fast64_t Ticks() const;
 
-    /** Total seconds have spent */
+    /** Total seconds have been spent */
     double Seconds() const;
 
-    /** Average seconds have spent per call */
+    /** Average seconds have been spent per call */
     double AverageSeconds() const;
 
-    /** Test the counter for any value. */
-    explicit operator bool () const;
-
-    /** Update the counter */
-    void Update(uint64_t callTicks);
-
-    /** Reset the counter */
-    void Reset();
-    void Reset() const;
-
-    /** Constructor */
-    explicit Counter(std::string&& name);
-
 private:
-    std::string name_;
-    std::atomic_uint_fast64_t calls_;
-    std::atomic_uint_fast64_t ticks_;
+    const std::string* name_ptr_;
+    uint_fast64_t calls_;
+    uint_fast64_t ticks_;
+};
+
+class Counters : public std::vector<Counter> {
+public:
+    Counter operator[](const char* name) const;
 };
 
 } // namespace perfmon
 
 /** Get list of the available counters */
 #define PERFMON_COUNTERS()
-
-/** Get a counter with a specific name */
-#define PERFMON_COUNTER(counter_name)
 
 /** Create a monitor for the following scope */
 #define PERFMON_SCOPE(counter_name)

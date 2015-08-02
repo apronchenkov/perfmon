@@ -38,10 +38,7 @@ inline uint64_t TicksElapsed(Tick startTick, Tick stopTick)
     return stopTick - startTick;
 }
 
-#define ticks_h__ok__
-#endif // defined(__i386__)
-
-#if defined(__x86_64__)
+#elif defined(__x86_64__)
 
 typedef uint64_t Tick;
 
@@ -61,8 +58,25 @@ inline uint64_t TicksElapsed(Tick startTick, Tick stopTick)
 #endif // defined(__x86_64__)
 #endif // defined(__GNUC__) || defined(__ICC) || defined(__clang__)
 
+} } // namespace perfmon::internal
+
 #ifndef ticks_h__ok__
-#error Your platform is not supported.
-#endif // ticks_h__ok__
+
+#include <chrono>
+namespace perfmon {
+namespace internal {
+
+using Tick = std::chrono::high_resolution_clock::time_point;
+
+inline Tick ReadTickCounter()
+{
+    return std::chrono::high_resolution_clock::now();
+}
+
+inline uint64_t TicksElapsed(Tick startTick, Tick stopTick) {
+    return (stopTick - startTick).count();
+}
 
 } } // namespace perfmon::internal
+
+#endif // ticks_h__ok__
