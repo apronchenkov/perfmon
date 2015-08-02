@@ -13,8 +13,8 @@ namespace perfmon {
 namespace internal {
 
 struct TssCounter {
-    uint_fast64_t calls;
-    uint_fast64_t ticks;
+    volatile uint_fast64_t calls;
+    volatile uint_fast64_t ticks;
 };
 
 struct TssCounters {
