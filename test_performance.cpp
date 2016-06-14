@@ -101,6 +101,6 @@ BOOST_AUTO_TEST_CASE(test_performance)
     BOOST_REQUIRE_EQUAL (counters["gcd_1_thread"].Calls(), counters["gcd_2_thread"].Calls());
     BOOST_REQUIRE_EQUAL (counters["gcd_1_thread"].Calls(), counters["gcd_4_thread"].Calls());
 
-    BOOST_REQUIRE (counters["gcd_1_thread"].Ticks() > 0.85 * counters["gcd_2_thread"].Ticks());
-    BOOST_REQUIRE (counters["gcd_2_thread"].Ticks() > 0.85 * counters["gcd_4_thread"].Ticks());
+    BOOST_REQUIRE (counters["gcd_1_thread"].Ticks() > 0.89 * counters["gcd_2_thread"].Ticks());
+    BOOST_REQUIRE (counters["gcd_2_thread"].Ticks() > 0.89 * counters["gcd_4_thread"].Ticks());
 }

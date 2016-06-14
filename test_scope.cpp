@@ -4,6 +4,7 @@
 BOOST_AUTO_TEST_CASE(test_scope_undef)
 {
     const auto counters = PERFMON_COUNTERS();
+    BOOST_REQUIRE_EQUAL (counters["scope_undef"].Name(), "");
     BOOST_REQUIRE_EQUAL (counters["scope_undef"].Calls(), 0);
     BOOST_REQUIRE_EQUAL (counters["scope_undef"].Ticks(), 0);
 }
@@ -15,8 +16,8 @@ BOOST_AUTO_TEST_CASE(test_scope_def)
     { PERFMON_SCOPE ("scope_def_B"); }
     { PERFMON_SCOPE ("scope_def_B"); }
 
-    int scope_def_A_found = 0;
-    int scope_def_B_found = 0;
+    size_t scope_def_A_found = 0;
+    size_t scope_def_B_found = 0;
     for (const auto& counter : PERFMON_COUNTERS()) {
         if (counter.Name() == "scope_def_A") {
             BOOST_REQUIRE_EQUAL (counter.Calls(), 1);
