@@ -38,6 +38,7 @@ inline uint64_t TicksElapsed(Tick startTick, Tick stopTick)
     return stopTick - startTick;
 }
 
+#define ticks_h__ok__
 #elif defined(__x86_64__)
 
 typedef uint64_t Tick;
