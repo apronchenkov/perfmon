@@ -1,8 +1,7 @@
 #include "counters.h"
 #include "perfmon/thread_specific_counters.h"
-#include <memory>
+#include <deque>
 #include <mutex>
-#include <vector>
 
 namespace perfmon {
 namespace internal {
@@ -11,21 +10,21 @@ namespace {
 
 struct GlobalCounter {
     explicit GlobalCounter(const char* name)
-      : name(new std::string(name))
+      : name(name)
       , commited_calls(0)
       , commited_ticks(0)
     { }
 
-    std::unique_ptr<std::string> name;
+    std::string name;
     uint_fast64_t commited_calls;
     uint_fast64_t commited_ticks;
     uint_fast64_t accumulated_calls;
     uint_fast64_t accumulated_ticks;
 };
 
-std::vector<GlobalCounter>& GlobalCounters()
+std::deque<GlobalCounter>& GlobalCounters()
 {
-    static auto * const result = new std::vector<GlobalCounter>();
+    static auto * const result = new std::deque<GlobalCounter>();
     return *result;
 }
 
@@ -46,7 +45,7 @@ Counters GetCounters()
     result.reserve(global_counters.size());
     for (const auto& global_counter : global_counters) {
         result.emplace_back(
-            global_counter.name.get(),
+            &global_counter.name,
             global_counter.commited_calls + global_counter.accumulated_calls,
             global_counter.commited_ticks + global_counter.accumulated_ticks);
     }
@@ -58,7 +57,7 @@ size_t GetCounterIndex(const char* counter_name)
     const auto guard = GlobalLockGuard();
     auto& global_counters = GlobalCounters();
     for (size_t i = 0; i < global_counters.size(); ++i) {
-        if (*global_counters[i].name == counter_name) {
+        if (global_counters[i].name == counter_name) {
             return i;
         }
     }
