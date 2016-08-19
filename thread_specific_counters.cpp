@@ -107,10 +107,13 @@ TssCountersHolder& TssCountersHolder::GetInstance()
 } // namespace
 
 
-TssCounters CreateTssCounters()
+extern RERFMON_THREAD_SPECIFIC TssCounters global_tss_counters = {0, nullptr};
+
+
+void ExpandTssCounters()
 {
     const auto guard = GlobalLockGuard();
-    return TssCountersHolder::GetInstance().UnsafeExpand();
+    global_tss_counters = TssCountersHolder::GetInstance().UnsafeExpand();
 }
 
 void UnsafeFlushTssCounters()

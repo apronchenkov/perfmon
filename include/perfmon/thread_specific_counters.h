@@ -22,15 +22,16 @@ struct TssCounters {
     TssCounter* counters;
 };
 
-TssCounters CreateTssCounters();
+extern RERFMON_THREAD_SPECIFIC TssCounters global_tss_counters;
+
+void ExpandTssCounters();
 
 inline void UpdateTssCounter(size_t counter_index, uint_fast64_t ticks)
 {
-    static PERFMON_THREAD_SPECIFIC TssCounters tss_counters;
-    if (tss_counters.size <= counter_index) {
-        tss_counters = CreateTssCounters();
+    if (global_tss_counters.size <= counter_index) {
+        ExpandTssCounters();
     }
-    auto& counter = tss_counters.counters[counter_index];
+    auto& counter = global_tss_counters.counters[counter_index];
     counter.calls += 1;
     counter.ticks += ticks;
 }
