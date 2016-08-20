@@ -47,16 +47,16 @@ namespace perfmon {
 class Counter {
 public:
     /** Constructor */
-    Counter(const std::string* name_ptr, uint_fast64_t calls, uint_fast64_t ticks);
+    Counter(const std::string* name_ptr, uint64_t calls, uint64_t ticks);
 
     /** Name of the counter scope */
     const std::string& Name() const;
 
     /** Total number of calls */
-    uint_fast64_t Calls() const;
+    uint64_t Calls() const;
 
     /** Total ticks have spent */
-    uint_fast64_t Ticks() const;
+    uint64_t Ticks() const;
 
     /** Total seconds have been spent */
     double Seconds() const;
@@ -66,8 +66,8 @@ public:
 
 private:
     const std::string* name_ptr_;
-    uint_fast64_t calls_;
-    uint_fast64_t ticks_;
+    uint64_t calls_;
+    uint64_t ticks_;
 };
 
 class Counters : public std::vector<Counter> {

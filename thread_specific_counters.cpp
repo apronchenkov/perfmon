@@ -13,16 +13,19 @@ namespace {
 
 class TssCountersHolder {
 public:
-    static TssCountersHolder& GetInstance();
-
-    TssCountersHolder()
+    static TssCounters Expand()
     {
-        next_ = head;
-        prev_ = nullptr;
-        if (head) {
-            head->prev_ = this;
+        const auto guard = GlobalLockGuard();
+        auto& instance = UnsafeGetInstance();
+        instance.counters_.resize((UnsafeNumberOfCounters() / 16 + 1) * 16, TssCounter{0, 0});
+        return TssCounters{ instance.counters_.size(), &instance.counters_[0] };
+    }
+
+    static void UnsafeFlushAll()  // Must be protected by the global mutex!
+    {
+        for (auto* it = global_head; it; it = it->next_) {
+            it->UnsafeFlush();
         }
-        head = this;
     }
 
     ~TssCountersHolder()
@@ -34,8 +37,8 @@ public:
         if (prev_) {
             prev_->next_ = next_;
         }
-        if (head == this) {
-            head = next_;
+        if (global_head == this) {
+            global_head = next_;
         }
         const size_t size = std::min(counters_.size(), UnsafeNumberOfCounters());
         for (size_t i = 0; i < size; ++i) {
@@ -43,10 +46,17 @@ public:
         }
     }
 
-    TssCounters UnsafeExpand()
+private:
+    static TssCountersHolder& UnsafeGetInstance();  // Must be protected by the global mutex!
+
+    TssCountersHolder()  // Must be protected by the global mutex!
     {
-        counters_.resize((UnsafeNumberOfCounters() / 16 + 1) * 16, TssCounter{0, 0});
-        return TssCounters{ counters_.size(), &counters_[0] };
+        next_ = global_head;
+        prev_ = nullptr;
+        if (global_head) {
+            global_head->prev_ = this;
+        }
+        global_head = this;
     }
 
     void UnsafeFlush()  // Must be protected by the global mutex!
@@ -60,30 +70,18 @@ public:
         }
     }
 
-    static void UnsafeFlushAll()  // Must be protected by the global mutex!
-    {
-        UnsafeResetAccumulators();
-        auto* item = head;
-        while (item) {
-            item->UnsafeFlush();
-            item = item->next_;
-        }
-    }
-
-private:
     std::vector<TssCounter> counters_;
     TssCountersHolder* next_;
     TssCountersHolder* prev_;
-    static TssCountersHolder* head;
+    static TssCountersHolder* global_head;
 };
 
-
-TssCountersHolder* TssCountersHolder::head;
+TssCountersHolder* TssCountersHolder::global_head;
 
 
 #if PERFMON_CONFIG__COMPILER_CXX_THREAD_LOCAL
 
-TssCountersHolder& TssCountersHolder::GetInstance()
+TssCountersHolder& TssCountersHolder::UnsafeGetInstance()
 {
     static thread_local TssCountersHolder instance;
     return instance;
@@ -91,7 +89,7 @@ TssCountersHolder& TssCountersHolder::GetInstance()
 
 #else // PERFMON_CONFIG__COMPILER_CXX_THREAD_LOCAL
 
-TssCountersHolder& TssCountersHolder::GetInstance()
+TssCountersHolder& TssCountersHolder::UnsafeGetInstance()
 {
     static PERFMON_THREAD_SPECIFIC TssCountersHolder* instance;
     if (!instance) {
@@ -106,14 +104,12 @@ TssCountersHolder& TssCountersHolder::GetInstance()
 
 } // namespace
 
-
-extern RERFMON_THREAD_SPECIFIC TssCounters global_tss_counters = {0, nullptr};
+PERFMON_THREAD_SPECIFIC TssCounters global_tss_counters;
 
 
 void ExpandTssCounters()
 {
-    const auto guard = GlobalLockGuard();
-    global_tss_counters = TssCountersHolder::GetInstance().UnsafeExpand();
+    global_tss_counters = TssCountersHolder::Expand();
 }
 
 void UnsafeFlushTssCounters()

@@ -9,7 +9,7 @@
 
 namespace perfmon {
 
-inline Counter::Counter(const std::string* name_ptr, uint_fast64_t calls, uint_fast64_t ticks)
+inline Counter::Counter(const std::string* name_ptr, uint64_t calls, uint64_t ticks)
   : name_ptr_(name_ptr)
   , calls_(calls)
   , ticks_(ticks)
@@ -20,12 +20,12 @@ inline const std::string& Counter::Name() const
     return *name_ptr_;
 }
 
-inline uint_fast64_t Counter::Calls() const
+inline uint64_t Counter::Calls() const
 {
     return calls_;
 }
 
-inline uint_fast64_t Counter::Ticks() const
+inline uint64_t Counter::Ticks() const
 {
     return ticks_;
 }

@@ -2,7 +2,6 @@
 
 #include "perfmon.h"
 #include <mutex>
-#include <vector>
 
 namespace perfmon {
 namespace internal {
@@ -14,7 +13,6 @@ size_t GetCounterIndex(const char* counter_name);
 /* private api */
 std::unique_lock<std::mutex> GlobalLockGuard();
 size_t UnsafeNumberOfCounters();
-void UnsafeResetAccumulators();
 void UnsafeAccumulate(size_t counter_index, uint_fast64_t calls, uint_fast64_t ticks);
 void UnsafeCommit(size_t counter_index, uint_fast64_t calls, uint_fast64_t ticks);
 

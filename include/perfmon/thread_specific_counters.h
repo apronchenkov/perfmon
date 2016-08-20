@@ -22,7 +22,7 @@ struct TssCounters {
     TssCounter* counters;
 };
 
-extern RERFMON_THREAD_SPECIFIC TssCounters global_tss_counters;
+extern PERFMON_THREAD_SPECIFIC TssCounters global_tss_counters;
 
 void ExpandTssCounters();
 

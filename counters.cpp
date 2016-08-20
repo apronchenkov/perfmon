@@ -28,6 +28,15 @@ std::deque<GlobalCounter>& GlobalCounters()
     return *result;
 }
 
+void UnsafeResetAccumulators()
+{
+    auto& global_counters = GlobalCounters();
+    for (auto& global_counter : global_counters) {
+        global_counter.accumulated_calls = 0;
+        global_counter.accumulated_ticks = 0;
+    }
+}
+
 } // namespace
 
 std::unique_lock<std::mutex> GlobalLockGuard()
@@ -39,8 +48,9 @@ std::unique_lock<std::mutex> GlobalLockGuard()
 Counters GetCounters()
 {
     const auto guard = GlobalLockGuard();
-    auto& global_counters = GlobalCounters();
+    UnsafeResetAccumulators();
     UnsafeFlushTssCounters();
+    auto& global_counters = GlobalCounters();
     Counters result;
     result.reserve(global_counters.size());
     for (const auto& global_counter : global_counters) {
@@ -70,14 +80,6 @@ size_t UnsafeNumberOfCounters()
     return GlobalCounters().size();
 }
 
-void UnsafeResetAccumulators()
-{
-    auto& global_counters = GlobalCounters();
-    for (auto& global_counter : global_counters) {
-        global_counter.accumulated_calls = 0;
-        global_counter.accumulated_ticks = 0;
-    }
-}
 
 void UnsafeAccumulate(size_t counter_index, uint_fast64_t calls, uint_fast64_t ticks)
 {
