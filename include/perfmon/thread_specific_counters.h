@@ -1,13 +1,6 @@
 #pragma once
-#include "config.h"
 #include <cstddef>
 #include <cstdint>
-
-#if PERFMON_CONFIG__COMPILER_IS_MSVC
-#define PERFMON_THREAD_SPECIFIC  __declspec(thread)
-#else
-#define PERFMON_THREAD_SPECIFIC  __thread
-#endif
 
 namespace perfmon {
 namespace internal {
@@ -22,7 +15,7 @@ struct TssCounters {
     TssCounter* counters;
 };
 
-extern PERFMON_THREAD_SPECIFIC TssCounters global_tss_counters;
+extern thread_local TssCounters global_tss_counters;
 
 void ExpandTssCounters();
 

@@ -3,10 +3,6 @@
 #include <algorithm>
 #include <vector>
 
-#if !PERFMON_CONFIG__COMPILER_CXX_THREAD_LOCAL
-#include <boost/thread/tss.hpp>
-#endif
-
 namespace perfmon {
 namespace internal {
 namespace {
@@ -78,34 +74,15 @@ private:
 
 TssCountersHolder* TssCountersHolder::global_head;
 
-
-#if PERFMON_CONFIG__COMPILER_CXX_THREAD_LOCAL
-
 TssCountersHolder& TssCountersHolder::UnsafeGetInstance()
 {
     static thread_local TssCountersHolder instance;
     return instance;
 }
 
-#else // PERFMON_CONFIG__COMPILER_CXX_THREAD_LOCAL
-
-TssCountersHolder& TssCountersHolder::UnsafeGetInstance()
-{
-    static PERFMON_THREAD_SPECIFIC TssCountersHolder* instance;
-    if (!instance) {
-        static boost::thread_specific_ptr<TssCountersHolder> tss_ptr;
-        tss_ptr.reset(new TssCountersHolder);
-        instance = tss_ptr.get();
-    }
-    return *instance;
-}
-
-#endif // PERFMON_CONFIG__COMPILER_CXX_THREAD_LOCAL
-
 } // namespace
 
-PERFMON_THREAD_SPECIFIC TssCounters global_tss_counters;
-
+thread_local TssCounters global_tss_counters;
 
 void ExpandTssCounters()
 {
