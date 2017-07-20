@@ -1,0 +1,14 @@
+IndentWidth: 2
+ColumnLimit: 80
+BasedOnStyle: Google
+
+DerivePointerAlignment: false
+PointerAlignment: Right
+
+IncludeCategories:
+  - Regex:           '^"[^@]'
+    Priority:        1
+  - Regex:           '^"'
+    Priority:        2
+  - Regex:           '^<'
+    Priority:        3
