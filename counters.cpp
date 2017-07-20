@@ -1,5 +1,5 @@
 #include "counters.h"
-#include "perfmon/thread_specific_counters.h"
+#include "public/perfmon/thread_specific_counters.h"
 #include <deque>
 #include <mutex>
 

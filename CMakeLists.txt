@@ -5,10 +5,6 @@ project(perfmon)
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 find_package(Threads)
 
-include_directories(
-    BEFORE SYSTEM
-    ${CMAKE_CURRENT_SOURCE_DIR}/public)
-
 # perfmon
 
 add_library(perfmon
@@ -59,4 +55,3 @@ install(
 
 install(
     DIRECTORY public DESTINATION include)
-

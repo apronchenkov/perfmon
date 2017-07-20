@@ -1,6 +1,6 @@
-#include "perfmon/cpu_frequency.h"
-#include "perfmon.h"
-#include "perfmon/ticks.h"
+#include "public/perfmon/cpu_frequency.h"
+#include "public/perfmon.h"
+#include "public/perfmon/ticks.h"
 
 #include <algorithm>
 #include <chrono>

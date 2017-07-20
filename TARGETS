@@ -1,0 +1,26 @@
+cxx_library(
+    name='perfmon',
+    srcs=[
+        'counters.cpp',
+        'cpu_frequency.cpp',
+        'thread_specific_counters.cpp',
+    ],
+    headers=[
+        'counters.h',
+        'public/perfmon.h',
+        'public/perfmon/cpu_frequency.h',
+        'public/perfmon/perfmon_inl.h',
+        'public/perfmon/thread_specific_counters.h',
+        'public/perfmon/ticks.h',
+    ],
+)
+
+cxx_binary(
+    name='perfmon_sample',
+    srcs=[
+        'sample.cpp',
+    ],
+    deps=[
+        ':perfmon',
+    ],
+)
