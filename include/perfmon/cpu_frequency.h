@@ -6,4 +6,5 @@ namespace internal {
 /** Estimate the cpu frequency. */
 double EstimateCpuFrequency();
 
-} } // namespace perfmon::internal
+}  // namespace internal
+}  // namespace perfmon
