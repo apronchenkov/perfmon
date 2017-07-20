@@ -7,8 +7,7 @@ find_package(Threads)
 
 include_directories(
     BEFORE SYSTEM
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_BINARY_DIR}/include)
+    ${CMAKE_CURRENT_SOURCE_DIR}/public)
 
 # perfmon
 
@@ -17,11 +16,11 @@ add_library(perfmon
     counters.h
     cpu_frequency.cpp
     thread_specific_counters.cpp
-    include/perfmon.h
-    include/perfmon/cpu_frequency.h
-    include/perfmon/perfmon_inl.h
-    include/perfmon/thread_specific_counters.h
-    include/perfmon/ticks.h)
+    public/perfmon.h
+    public/perfmon/cpu_frequency.h
+    public/perfmon/perfmon_inl.h
+    public/perfmon/thread_specific_counters.h
+    public/perfmon/ticks.h)
 
 set_property(TARGET perfmon PROPERTY CXX_STANDARD 11)
 
@@ -59,7 +58,5 @@ install(
     LIBRARY DESTINATION lib)
 
 install(
-    DIRECTORY include DESTINATION .)
+    DIRECTORY public DESTINATION include)
 
-install(
-    FILES DESTINATION include/perfmon)
