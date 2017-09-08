@@ -23,7 +23,9 @@ inline double Counter::Seconds() const {
   return Ticks() / internal::EstimateCpuFrequency();
 }
 
-inline double Counter::AverageSeconds() const { return Seconds() / Calls(); }
+inline double Counter::AverageSeconds() const {
+  return Calls() ? Seconds() / Calls() : 0.0;
+}
 
 inline Counter Counters::operator[](const char *name) const {
   for (auto it = begin(); it != end(); ++it) {

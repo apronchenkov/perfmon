@@ -26,7 +26,8 @@ add_executable(perfmon_test
     test.cpp
     test_scope.cpp
     test_statement.cpp
-    test_performance.cpp)
+    test_performance.cpp
+    test_regression.cpp)
 
 set_property(TARGET perfmon_test PROPERTY CXX_STANDARD 11)
 
