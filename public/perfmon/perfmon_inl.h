@@ -73,10 +73,11 @@ Counters GetCounters();
 #define PERFMON_INTERNAL_SCOPE_VAR \
   PERFMON_INTERNAL_CONCAT(perfmon_scope_monitor_, __COUNTER__)
 #define PERFMON_INTERNAL_INDEX(counter_name)                           \
-  ([](const char *name) -> size_t {                                    \
+  ([] {                                                                \
+    constexpr const char *name = (counter_name);                       \
     static size_t result = ::perfmon::internal::GetCounterIndex(name); \
     return result;                                                     \
-  }(counter_name))
+  }())
 
 #define PERFMON_SCOPE(counter_name)       \
   const auto PERFMON_INTERNAL_SCOPE_VAR = \
