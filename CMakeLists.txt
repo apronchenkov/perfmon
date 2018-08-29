@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
-include(WriteCompilerDetectionHeader)
-project(perfmon)
+project(perfmon LANGUAGES CXX)
 
-find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+find_package(Boost COMPONENTS unit_test_framework)
 find_package(Threads)
 
 # perfmon
@@ -18,18 +17,16 @@ add_library(perfmon
     public/perfmon/thread_specific_counters.h
     public/perfmon/ticks.h)
 
-set_property(TARGET perfmon PROPERTY CXX_STANDARD 11)
+target_compile_features(perfmon PUBLIC cxx_std_11)
 
 # testing
-
-add_executable(perfmon_test
-    test.cpp
-    test_scope.cpp
-    test_statement.cpp
-    test_performance.cpp
-    test_regression.cpp)
-
-set_property(TARGET perfmon_test PROPERTY CXX_STANDARD 11)
+IF(Boost_UNIT_TEST_FRAMEWORK_FOUND)
+    add_executable(perfmon_test
+        test.cpp
+        test_scope.cpp
+        test_statement.cpp
+        test_performance.cpp
+        test_regression.cpp)
 
 target_link_libraries(perfmon_test
     perfmon
@@ -38,12 +35,11 @@ target_link_libraries(perfmon_test
 
 enable_testing()
 add_test(perfmon_test perfmon_test)
+ENDIF(Boost_UNIT_TEST_FRAMEWORK_FOUND)
 
 # sample
 
 add_executable(sample sample.cpp)
-
-set_property(TARGET sample PROPERTY CXX_STANDARD 11)
 
 target_link_libraries(sample perfmon ${CMAKE_THREAD_LIBS_INIT})
 
@@ -55,4 +51,4 @@ install(
     LIBRARY DESTINATION lib)
 
 install(
-    DIRECTORY public DESTINATION include)
+    DIRECTORY public/ DESTINATION include)
