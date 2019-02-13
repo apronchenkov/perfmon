@@ -72,19 +72,21 @@ Counters GetCounters();
 #define PERFMON_INTERNAL_CONCAT(x, y) PERFMON_INTERNAL__CONCAT(x, y)
 #define PERFMON_INTERNAL_SCOPE_VAR \
   PERFMON_INTERNAL_CONCAT(perfmon_scope_monitor_, __COUNTER__)
-#define PERFMON_INTERNAL_INDEX(counter_name)                           \
-  ([] {                                                                \
-    constexpr const char *name = (counter_name);                       \
-    static size_t result = ::perfmon::internal::GetCounterIndex(name); \
-    return result;                                                     \
+#define PERFMON_INTERNAL_INDEX(counter_name)                    \
+  ([] {                                                         \
+    constexpr const char *perfmon_internal_index_counter_name = \
+        (counter_name);                                         \
+    static size_t perfmon_internal_index_result =               \
+        ::perfmon::internal::GetCounterIndex(                   \
+            perfmon_internal_index_counter_name);               \
+    return perfmon_internal_index_result;                       \
   }())
 
 #define PERFMON_SCOPE(counter_name)       \
   const auto PERFMON_INTERNAL_SCOPE_VAR = \
       ::perfmon::internal::Monitor(PERFMON_INTERNAL_INDEX(counter_name))
 
-#define PERFMON_STATEMENT(counter_name)                                       \
-  if (PERFMON_SCOPE(                                                          \
-          counter_name)) { /* Suppress the 'control may reach end of non-void \
-                              function' warning */                            \
+#define PERFMON_STATEMENT(counter_name)                                        \
+  if (PERFMON_SCOPE(counter_name)) { /* Suppress the 'control may reach end of \
+                                        non-void function' warning */          \
   } else

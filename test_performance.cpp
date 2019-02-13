@@ -25,7 +25,7 @@ int gcd(int a, int b) {
 }
 
 void gcd_1_thread() {
-  for (int i = 0; i < 4; ++i) {
+  for (int t = 0; t < 4; ++t) {
     PERFMON_SCOPE("gcd_1_thread");
     int result = 0;
     for (int i = 0; i < N; ++i) {
@@ -39,7 +39,7 @@ void gcd_1_thread() {
 }
 
 void gcd_2_thread() {
-  for (int i = 0; i < 2; ++i) {
+  for (int t = 0; t < 2; ++t) {
     PERFMON_SCOPE("gcd_2_thread");
     int result = 0;
     for (int i = 0; i < N; ++i) {

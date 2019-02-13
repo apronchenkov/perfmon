@@ -54,7 +54,8 @@ inline uint64_t TicksElapsed(Tick startTick, Tick stopTick) {
 #define PERFMON_TICKS_OK
 #endif  // defined(__x86_64__)
 #endif  // defined(__GNUC__) || defined(__ICC) || defined(__clang__)
-}
+
+}  // namespace internal
 }  // namespace perfmon
 
 #ifndef PERFMON_TICKS_OK

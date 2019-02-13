@@ -24,3 +24,20 @@ cc_binary(
         ':perfmon',
     ],
 )
+
+cc_binary(
+    name='test',
+    srcs=[
+        'test.cpp',
+        'test_performance.cpp',
+        'test_regression.cpp',
+        'test_scope.cpp',
+        'test_statement.cpp',
+    ],
+    deps=[
+        ':perfmon',
+    ],
+    linker_flags=[
+        '-lboost_unit_test_framework',
+    ],
+)
