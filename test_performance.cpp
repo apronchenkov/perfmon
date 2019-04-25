@@ -1,6 +1,7 @@
+#include <gtest/gtest.h>
+
 #include "public/perfmon.h"
 #include <atomic>
-#include <boost/test/unit_test.hpp>
 #include <thread>
 
 namespace {
@@ -66,7 +67,7 @@ void gcd_4_thread() {
 
 }  // namespace
 
-BOOST_AUTO_TEST_CASE(test_performance) {
+TEST(Performance, Gcd) {
   {  // 1 thread
     std::thread t1(gcd_1_thread);
     t1.join();
@@ -89,17 +90,15 @@ BOOST_AUTO_TEST_CASE(test_performance) {
     t4.join();
   }
 
-  BOOST_REQUIRE_EQUAL(global_gcd_1_result, global_gcd_2_result);
-  BOOST_REQUIRE_EQUAL(global_gcd_1_result, global_gcd_4_result);
+  EXPECT_EQ(global_gcd_1_result, global_gcd_2_result);
+  EXPECT_EQ(global_gcd_1_result, global_gcd_4_result);
 
   const auto counters = PERFMON_COUNTERS();
-  BOOST_REQUIRE_EQUAL(counters["gcd_1_thread"].Calls(),
-                      counters["gcd_2_thread"].Calls());
-  BOOST_REQUIRE_EQUAL(counters["gcd_1_thread"].Calls(),
-                      counters["gcd_4_thread"].Calls());
+  EXPECT_EQ(counters["gcd_1_thread"].Calls(), counters["gcd_2_thread"].Calls());
+  EXPECT_EQ(counters["gcd_1_thread"].Calls(), counters["gcd_4_thread"].Calls());
 
-  BOOST_REQUIRE(counters["gcd_1_thread"].Ticks() >
-                0.89 * counters["gcd_2_thread"].Ticks());
-  BOOST_REQUIRE(counters["gcd_2_thread"].Ticks() >
-                0.89 * counters["gcd_4_thread"].Ticks());
+  EXPECT_GT(counters["gcd_1_thread"].Ticks(),
+            0.8 * counters["gcd_2_thread"].Ticks());
+  EXPECT_GT(counters["gcd_2_thread"].Ticks(),
+            0.8 * counters["gcd_4_thread"].Ticks());
 }

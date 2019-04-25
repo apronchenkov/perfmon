@@ -1,15 +1,16 @@
-#include "public/perfmon.h"
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
-BOOST_AUTO_TEST_CASE(test_average_seconds_division_by_zero) {
+#include "public/perfmon.h"
+
+TEST(Regression, AverageSecondsDivisionByZero) {
   PERFMON_SCOPE("xyz");
   auto counter = PERFMON_COUNTERS()["xyz"];
-  BOOST_REQUIRE_EQUAL(counter.Calls(), 0);
-  BOOST_REQUIRE_EQUAL(counter.AverageSeconds(), 0.0);
+  EXPECT_EQ(0U, counter.Calls());
+  EXPECT_EQ(0.0, counter.AverageSeconds());
 }
 
-BOOST_AUTO_TEST_CASE(test_name_shadowing) {
+TEST(Regression, NameShadowing) {
   PERFMON_STATEMENT("abc") { PERFMON_SCOPE("uvw"); }
-  BOOST_REQUIRE_EQUAL(PERFMON_COUNTERS()["abc"].Calls(), 1);
-  BOOST_REQUIRE_EQUAL(PERFMON_COUNTERS()["uvw"].Calls(), 1);
+  EXPECT_EQ(1U, PERFMON_COUNTERS()["abc"].Calls());
+  EXPECT_EQ(1U, PERFMON_COUNTERS()["uvw"].Calls());
 }

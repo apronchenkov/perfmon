@@ -28,7 +28,6 @@ cc_binary(
 cc_binary(
     name='test',
     srcs=[
-        'test.cpp',
         'test_performance.cpp',
         'test_regression.cpp',
         'test_scope.cpp',
@@ -36,8 +35,6 @@ cc_binary(
     ],
     deps=[
         ':perfmon',
-    ],
-    linker_flags=[
-        '-lboost_unit_test_framework',
+        '//github.com/apronchenkov/third_party:gtest',
     ],
 )
